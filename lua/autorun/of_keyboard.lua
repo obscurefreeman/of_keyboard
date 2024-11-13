@@ -224,7 +224,7 @@ if CLIENT then
 
     list.Set("DesktopWindows", "ofkb", {
         title = language.GetPhrase("of_keyboard.settings"),
-        icon = "icon16/keyboard.png",
+        icon = "icon16/ofkblogo.png",
         init = function()
             local menu = DermaMenu()
             menu:AddCVar(language.GetPhrase("of_keyboard.show"), "of_keyboard_enabled", "0", "1"):SetIcon("icon16/eye.png")
