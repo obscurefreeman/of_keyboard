@@ -1,4 +1,49 @@
 if CLIENT then
+    -- 创建语言表
+    local lang = GetConVar("gmod_language"):GetString()
+
+    -- 添加简体中文本地化
+    if lang == "zh-CN" then
+        language.Add("of_keyboard.title", "键位显示器")
+        language.Add("of_keyboard.enabled", "显示键位显示器")
+        language.Add("of_keyboard.locked", "锁定键位显示器")
+        language.Add("of_keyboard.settings", "键盘设置")
+        language.Add("of_keyboard.presets", "个性化")
+        language.Add("of_keyboard.preset.lambda", "拉姆达")
+        language.Add("of_keyboard.preset.pink", "活力粉")
+        language.Add("of_keyboard.preset.green", "翠绿色")
+        language.Add("of_keyboard.preset.violet", "紫罗兰")
+        language.Add("of_keyboard.preset.yellow", "丰收黄")
+        language.Add("of_keyboard.show", "显示键盘")
+        language.Add("of_keyboard.lock", "锁定键盘")
+    elseif lang == "ru" then
+        language.Add("of_keyboard.title", "Отображение клавиш")
+        language.Add("of_keyboard.enabled", "Показать отображение клавиш")
+        language.Add("of_keyboard.locked", "Заблокировать отображение клавиш")
+        language.Add("of_keyboard.settings", "Настройки клавиатуры")
+        language.Add("of_keyboard.presets", "Персонализация")
+        language.Add("of_keyboard.preset.lambda", "Лямбда")
+        language.Add("of_keyboard.preset.pink", "Яркий розовый")
+        language.Add("of_keyboard.preset.green", "Изумрудный")
+        language.Add("of_keyboard.preset.violet", "Фиолетовый")
+        language.Add("of_keyboard.preset.yellow", "Золотой урожай")
+        language.Add("of_keyboard.show", "Показать клавиатуру")
+        language.Add("of_keyboard.lock", "Заблокировать клавиатуру")
+    else
+        language.Add("of_keyboard.title", "Key Display")
+        language.Add("of_keyboard.enabled", "Show Key Display")
+        language.Add("of_keyboard.locked", "Lock Key Display")
+        language.Add("of_keyboard.settings", "Keyboard Settings")
+        language.Add("of_keyboard.presets", "Personalization")
+        language.Add("of_keyboard.preset.lambda", "Lambda")
+        language.Add("of_keyboard.preset.pink", "Vibrant Pink")
+        language.Add("of_keyboard.preset.green", "Emerald")
+        language.Add("of_keyboard.preset.violet", "Violet")
+        language.Add("of_keyboard.preset.yellow", "Harvest Gold")
+        language.Add("of_keyboard.show", "Show Keyboard")
+        language.Add("of_keyboard.lock", "Lock Keyboard")
+    end
+
     -- 创建ConVars
     local keyboard_enabled = CreateConVar("of_keyboard_enabled", "0", FCVAR_ARCHIVE, "显示/隐藏键位显示器")
     local keyboard_locked = CreateConVar("of_keyboard_locked", "0", FCVAR_ARCHIVE, "锁定/解锁键位显示器")
@@ -30,7 +75,7 @@ if CLIENT then
             self:Center()
         end
         
-        self:SetTitle("键位显示")
+        self:SetTitle(language.GetPhrase("of_keyboard.title"))
         -- 默认启用鼠标输入
         self:MakePopup()
         
@@ -74,7 +119,7 @@ if CLIENT then
                 self:SetDraggable(true)
                 self:MakePopup()
                 self:DockPadding(5, 24, 5, 5) -- 恢复标题栏空间
-                self:SetTitle("键位显示")  -- 恢复标题文本
+                self:SetTitle(language.GetPhrase("of_keyboard.title"))  -- 恢复标题文本
                 self:SetSize(810, 310) -- 恢复原始窗口大小
             end
         end)
@@ -170,23 +215,23 @@ if CLIENT then
 
     -- 设置预设颜色方案
     local presets = {
-        ["拉姆达"] = {255, 140, 0},
-        ["活力粉"] = {238, 130, 238},
-        ["翠绿色"] = {50, 205, 50},
-        ["紫罗兰"] = {100, 100, 255},
-        ["丰收黄"] = {255, 215, 0}
+        [language.GetPhrase("of_keyboard.preset.lambda")] = {255, 140, 0},
+        [language.GetPhrase("of_keyboard.preset.pink")] = {238, 130, 238},
+        [language.GetPhrase("of_keyboard.preset.green")] = {50, 205, 50},
+        [language.GetPhrase("of_keyboard.preset.violet")] = {100, 100, 255},
+        [language.GetPhrase("of_keyboard.preset.yellow")] = {255, 215, 0}
     }
 
     list.Set("DesktopWindows", "ofkb", {
-        title = "键位显示器设置",
+        title = language.GetPhrase("of_keyboard.settings"),
         icon = "icon16/keyboard.png",
         init = function()
             local menu = DermaMenu()
-            menu:AddCVar("显示键位显示器", "of_keyboard_enabled", "0", "1"):SetIcon("icon16/eye.png")
-            menu:AddCVar("锁定键位显示器", "of_keyboard_locked", "0", "1"):SetIcon("icon16/lock.png")
+            menu:AddCVar(language.GetPhrase("of_keyboard.show"), "of_keyboard_enabled", "0", "1"):SetIcon("icon16/eye.png")
+            menu:AddCVar(language.GetPhrase("of_keyboard.lock"), "of_keyboard_locked", "0", "1"):SetIcon("icon16/lock.png")
             
             -- 添加颜色子菜单
-            local colorSubMenu, colorBtn = menu:AddSubMenu("颜色预设")
+            local colorSubMenu, colorBtn = menu:AddSubMenu(language.GetPhrase("of_keyboard.presets"))
             colorBtn:SetIcon("icon16/color_wheel.png")
             
             -- 添加预设颜色选项
