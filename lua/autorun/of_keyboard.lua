@@ -4,11 +4,21 @@ if CLIENT then
     local keyboard_locked = CreateConVar("of_keyboard_locked", "0", FCVAR_ARCHIVE, "锁定/解锁键位显示器")
     local keyboard_pos_x = CreateConVar("of_keyboard_pos_x", "-1", FCVAR_ARCHIVE, "键位显示器X坐标")
     local keyboard_pos_y = CreateConVar("of_keyboard_pos_y", "-1", FCVAR_ARCHIVE, "键位显示器Y坐标")
+    local keyboard_color_r = CreateConVar("of_keyboard_color_r", "100", FCVAR_ARCHIVE, "键位显示器按键高亮颜色R")
+    local keyboard_color_g = CreateConVar("of_keyboard_color_g", "100", FCVAR_ARCHIVE, "键位显示器按键高亮颜色G") 
+    local keyboard_color_b = CreateConVar("of_keyboard_color_b", "255", FCVAR_ARCHIVE, "键位显示器按键高亮颜色B")
+
+    -- 设置预设颜色的函数
+    local function SetPresetColor(r, g, b)
+        keyboard_color_r:SetInt(r)
+        keyboard_color_g:SetInt(g)
+        keyboard_color_b:SetInt(b)
+    end
 
     -- 创建虚拟键盘窗口
-    local PANEL = {}
+    local FRAME = {}
     
-    function PANEL:Init()
+    function FRAME:Init()
         self:SetSize(810, 310)
         
         -- 如果有保存的位置则使用,否则居中显示
@@ -23,6 +33,10 @@ if CLIENT then
         self:SetTitle("键位显示")
         -- 默认启用鼠标输入
         self:MakePopup()
+        
+        -- 隐藏最大化和最小化按钮
+        self:SetSizable(false)
+        self:ShowCloseButton(true)
         
         -- 存储所有按键状态
         self.KeyStates = {}
@@ -72,7 +86,7 @@ if CLIENT then
         end
     end
     
-    function PANEL:Paint(w, h)
+    function FRAME:Paint(w, h)
         draw.RoundedBox(8, 0, 0, w, h, Color(30, 30, 30, 200))
         
         local x, y = 10, keyboard_locked:GetBool() and 10 or 40  -- 锁定时调整起始Y坐标
@@ -95,7 +109,7 @@ if CLIENT then
                 -- 绘制按键背景
                 local keyColor = Color(50, 50, 50, 200)
                 if keyCode and input.IsKeyDown(keyCode) then
-                    keyColor = Color(100, 100, 255, 200)
+                    keyColor = Color(keyboard_color_r:GetInt(), keyboard_color_g:GetInt(), keyboard_color_b:GetInt(), 200)
                 end
                 draw.RoundedBox(4, x, y, width, keyHeight, keyColor)
                 
@@ -109,7 +123,7 @@ if CLIENT then
         end
     end
     
-    vgui.Register("KeyboardDisplay", PANEL, "DFrame")
+    vgui.Register("KeyboardDisplay", FRAME, "DFrame")
     
     -- 监听ConVar变化来显示/隐藏键盘
     cvars.AddChangeCallback("of_keyboard_enabled", function(_, _, new)
@@ -149,4 +163,36 @@ if CLIENT then
             end
         end
     end)
+
+    -- 设置预设颜色方案
+    local presets = {
+        ["拉姆达"] = {255, 140, 0},
+        ["活力粉"] = {238, 130, 238},
+        ["翠绿色"] = {50, 205, 50},
+        ["紫罗兰"] = {100, 100, 255},
+        ["丰收黄"] = {255, 215, 0}
+    }
+
+    list.Set("DesktopWindows", "ofkb", {
+        title = "键位显示器设置",
+        icon = "icon16/keyboard.png",
+        init = function()
+            local menu = DermaMenu()
+            menu:AddCVar("显示键位显示器", "of_keyboard_enabled", "0", "1"):SetIcon("icon16/eye.png")
+            menu:AddCVar("锁定键位显示器", "of_keyboard_locked", "0", "1"):SetIcon("icon16/lock.png")
+            
+            -- 添加颜色子菜单
+            local colorSubMenu, colorBtn = menu:AddSubMenu("颜色预设")
+            colorBtn:SetIcon("icon16/color_wheel.png")
+            
+            -- 添加预设颜色选项
+            for name, color in pairs(presets) do
+                colorSubMenu:AddOption(name, function()
+                    SetPresetColor(color[1], color[2], color[3])
+                end)
+            end
+            
+            menu:Open()
+        end
+    })
 end
