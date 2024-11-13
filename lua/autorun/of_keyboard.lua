@@ -2,13 +2,24 @@ if CLIENT then
     -- 创建ConVars
     local keyboard_enabled = CreateConVar("of_keyboard_enabled", "0", FCVAR_ARCHIVE, "显示/隐藏键位显示器")
     local keyboard_locked = CreateConVar("of_keyboard_locked", "0", FCVAR_ARCHIVE, "锁定/解锁键位显示器")
+    local keyboard_pos_x = CreateConVar("of_keyboard_pos_x", "-1", FCVAR_ARCHIVE, "键位显示器X坐标")
+    local keyboard_pos_y = CreateConVar("of_keyboard_pos_y", "-1", FCVAR_ARCHIVE, "键位显示器Y坐标")
 
     -- 创建虚拟键盘窗口
     local PANEL = {}
     
     function PANEL:Init()
         self:SetSize(810, 310)
-        self:Center()
+        
+        -- 如果有保存的位置则使用,否则居中显示
+        local saved_x = keyboard_pos_x:GetInt()
+        local saved_y = keyboard_pos_y:GetInt()
+        if saved_x >= 0 and saved_y >= 0 then
+            self:SetPos(saved_x, saved_y)
+        else
+            self:Center()
+        end
+        
         self:SetTitle("键位显示")
         -- 默认启用鼠标输入
         self:MakePopup()
@@ -29,6 +40,11 @@ if CLIENT then
         -- 监听ConVar变化
         cvars.AddChangeCallback("of_keyboard_locked", function(_, _, new)
             if new == "1" then
+                -- 保存当前位置
+                local x, y = self:GetPos()
+                keyboard_pos_x:SetInt(x)
+                keyboard_pos_y:SetInt(y)
+                
                 self:ShowCloseButton(false)
                 self:SetDraggable(false)
                 self:SetMouseInputEnabled(false)
