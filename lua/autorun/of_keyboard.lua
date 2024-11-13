@@ -53,6 +53,9 @@ if CLIENT then
 
         -- 监听ConVar变化
         cvars.AddChangeCallback("of_keyboard_locked", function(_, _, new)
+            -- 确保self是有效的面板
+            if not IsValid(self) then return end
+            
             if new == "1" then
                 -- 保存当前位置
                 local x, y = self:GetPos()
@@ -130,7 +133,8 @@ if CLIENT then
         if new == "1" then
             if not IsValid(keyboardFrame) then
                 keyboardFrame = vgui.Create("KeyboardDisplay")
-                if keyboard_locked:GetBool() then
+                -- 确保面板创建成功
+                if IsValid(keyboardFrame) and keyboard_locked:GetBool() then
                     keyboardFrame:ShowCloseButton(false)
                     keyboardFrame:SetDraggable(false)
                     keyboardFrame:SetMouseInputEnabled(false)
